@@ -220,7 +220,11 @@ def main():
         # loop through all the files with vulnerabilities and print out info
         for f in files_with_vulns:
             f.process()
-
+    else:
+         tabbed_print("Finnished scanning:"
+                      + directory
+                      + "\nNo vulns found"
+                     )
 # call main
 if __name__ == "__main__":
     main()
