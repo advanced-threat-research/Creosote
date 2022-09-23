@@ -5,6 +5,7 @@ Created on Jul 19 2022
 """
 
 # imports
+from base64 import encode
 import sys, glob, ast, os
 
 # global array of all analyzer objects where vulnerabilities were found
@@ -12,7 +13,7 @@ files_with_vulns = []
 
 # prints out that the user did not specify a directory
 def usage():
-    print("python creosote.py <directory to scan>")
+    print("python creosote.py <directory to scan> [file encoding]")
 
 # helper function to print out a string prepended with tabs
 def tabbed_print(msg, tabs=0):
@@ -20,7 +21,7 @@ def tabbed_print(msg, tabs=0):
     print(tabs + msg)
 
 # recursively scan the directory for vulnerabilities
-def scan(directory):
+def scan(directory, encoding='utf8'):
     global files_with_vulns
 
     # print that we have started scanning
@@ -33,7 +34,7 @@ def scan(directory):
         filename = filename.replace("/", os.sep)
 
         # open the file and try to read, sometimes fails due to illegal characters in the file
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding=encoding) as f:
             try:
                 text = f.read()
 
@@ -189,7 +190,7 @@ def main():
  """)
 
     # if the user didn't specify a directory, print usage and exit
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in [2, 3]:
         usage()
 
     # grab the directory to scan
@@ -203,7 +204,10 @@ def main():
     tabbed_print("Starting scan of:" + directory)
 
     # scan the directory for vulnerabilities
-    scan(directory)
+    if len(sys.argv) == 3:
+        scan(directory, sys.argv[2])
+    else:
+        scan(directory)
 
     # give the user a status report on findings
     if (len(files_with_vulns) > 0):
