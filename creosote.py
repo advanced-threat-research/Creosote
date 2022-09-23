@@ -32,26 +32,26 @@ def scan(directory):
         # glob only uses "/", this breaks for windows so we need to replace with the os sep
         filename = filename.replace("/", os.sep)
 
-        # open the file and try to read, sometimes fails due to illegal characters in the file
-        with open(filename, "r") as f:
-            try:
+        try:
+            # open the file and try to read, sometimes fails due to illegal characters in the file
+            with open(filename, "r") as f:
                 text = f.read()
 
-            # if it fails, catch the exception and print out the error message and filename
-            except Exception as e:
-                tabbed_print("Error reading file:" + filename, 2)
-                tabbed_print(str(e), 3)
-                continue
+                # if tarfile is in the source code then analyze the source
+                if "tarfile" in text:
 
-            # if tarfile is in the source code then analyze the source
-            if "tarfile" in text:
-                
-                # create an analyzer for the file
-                analyzer = Analyzer(filename, text) 
+                    # create an analyzer for the file
+                    analyzer = Analyzer(filename, text)
 
-                # if there were any results, add the file to the list
-                if analyzer.has_results():
-                    files_with_vulns.append(analyzer)
+                    # if there were any results, add the file to the list
+                    if analyzer.has_results():
+                        files_with_vulns.append(analyzer)
+
+        # if it fails, catch the exception and print out the error message and filename
+        except Exception as e:
+            tabbed_print("Error reading file:" + filename, 2)
+            tabbed_print(str(e), 3)
+            continue
 
     # give the user an update when the run is complete
     tabbed_print("Scan Completed", 2)
